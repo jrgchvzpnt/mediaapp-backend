@@ -32,6 +32,7 @@ public class Patient {
 
     @Column(nullable = false, length = 8)
     private String dni;
+    
     @Column(length = 150)
     private String address;
 

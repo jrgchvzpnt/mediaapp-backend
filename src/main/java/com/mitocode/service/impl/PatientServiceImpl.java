@@ -1,46 +1,25 @@
 package com.mitocode.service.impl;
 
 
-import java.util.List;
+
 import org.springframework.stereotype.Service;
 import com.mitocode.model.Patient;
+import com.mitocode.repo.IGenericRepo;
 import com.mitocode.repo.IPatientRepo;
 import com.mitocode.service.IPatientService;
 import lombok.RequiredArgsConstructor;
-import com.mitocode.exception.ModelNotFoundException;
+
 
 
 @Service
 @RequiredArgsConstructor
-public class PatientServiceImpl  implements IPatientService {
+public class PatientServiceImpl extends CRUDImpl<Patient,Integer>  implements IPatientService {
    
     private final IPatientRepo repo;// = new PatientRepo();
 
     @Override
-    public Patient save(Patient patient) {
-        return repo.save(patient);
+    protected IGenericRepo<Patient, Integer> getRepo() {
+       return repo;
     }
 
-    @Override
-    public Patient update(Integer id, Patient patient) {
-        //VALIDAR EL ID java Reflection
-        return repo.save(patient);
-    }
-
-    @Override
-    public List<Patient> findAll() {
-        return repo.findAll();
-    }
-
-    @Override
-    public Patient findById(Integer id) {
-        return repo.findById(id).orElseThrow( ()  -> new ModelNotFoundException("ID NOT FOUND: " + id));
-    }
-
-    @Override
-    public void delete(Integer id) {
-        repo.deleteById(id);
-    }
-
-   
 }
