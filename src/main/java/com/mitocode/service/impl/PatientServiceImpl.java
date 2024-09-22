@@ -1,19 +1,13 @@
 package com.mitocode.service.impl;
 
+
 import java.util.List;
-
 import org.springframework.stereotype.Service;
-
 import com.mitocode.model.Patient;
 import com.mitocode.repo.IPatientRepo;
 import com.mitocode.service.IPatientService;
-
 import lombok.RequiredArgsConstructor;
-
-
-
-
-
+import com.mitocode.exception.ModelNotFoundException;
 
 
 @Service
@@ -40,7 +34,7 @@ public class PatientServiceImpl  implements IPatientService {
 
     @Override
     public Patient findById(Integer id) {
-        return repo.findById(id).orElse(new Patient());
+        return repo.findById(id).orElseThrow( ()  -> new ModelNotFoundException("ID NOT FOUND: " + id));
     }
 
     @Override

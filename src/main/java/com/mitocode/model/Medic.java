@@ -9,35 +9,30 @@ import lombok.*;
 
 
 
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 
-// Personalizar nombre de tabla y schema @Table(name ="tbl_patient", schema  ="sistemas")
-public class Patient {
+
+public class Medic {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
-    private Integer idPatient;
+    private Integer idMedic;
 
     @Column(nullable = false, length = 70)
     private String firstName;
 
     @Column(nullable = false, length = 70)
-    private String lastName;
+    private String LastName;
 
-    @Column(nullable = false, length = 8)
-    private String dni;
-    @Column(length = 150)
-    private String address;
+    @Column(nullable = false, length = 12)
+    private String cmp; // cedula medica en 
 
-    @Column(nullable = false, length = 9)
-    private String phone;
-    @Column(nullable = false, length = 55)
-    private String email;
+    @Column(nullable = true, length = 255)
+    private String photoURL;
 
 }
