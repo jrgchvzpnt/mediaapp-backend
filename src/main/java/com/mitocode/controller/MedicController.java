@@ -27,13 +27,9 @@ public class MedicController {
 
     //@Autowired
     private final IMedicService service;// = new MedicService();
-
-
-    
-    @Qualifier("medicMapper") // Aquí especificas cuál bean usar
+    @Qualifier("medicMapper")
     private final ModelMapper modelMapper;
 
-    
     /*public MedicController(MedicService service) {
         this.service = service;
     }*/
@@ -91,30 +87,11 @@ public class MedicController {
         return resource;
     }
 
-    private MedicDTO convertToDto(Medic medic) {
-        // Hacer el mapeo manual si ModelMapper no está funcionando correctamente
-        MedicDTO medicDTO = new MedicDTO();
-        medicDTO.setIdMedic(medic.getIdMedic());
-        medicDTO.setPrimaryName(medic.getFirstName());  // Mapea el campo firstName a primaryName
-        medicDTO.setSurname(medic.getLastName());       // Mapea el campo lastName a surname
-        medicDTO.setCmpMedic(medic.getCmp());           // Mapea cmp
-        medicDTO.setPhoto(medic.getPhotoUrl());         // Mapea photoUrl a photo
-    
-        return medicDTO;
+    private MedicDTO convertToDto(Medic obj){
+        return modelMapper.map(obj, MedicDTO.class);
     }
 
-    /*private Medic convertToEntity(MedicDTO dto){
+    private Medic convertToEntity(MedicDTO dto){
         return modelMapper.map(dto, Medic.class);
-    }*/
-
-    private Medic convertToEntity(MedicDTO dto) {
-        Medic medic = new Medic();
-        medic.setIdMedic(dto.getIdMedic());  // Asegurarse de mapear el ID correctamente
-        medic.setFirstName(dto.getPrimaryName());  // Mapeo de primaryName a firstName
-        medic.setLastName(dto.getSurname());       // Mapeo de surname a lastName
-        medic.setCmp(dto.getCmpMedic());           // Mapeo de cmpMedic a cmp
-        medic.setPhotoUrl(dto.getPhoto());         // Mapeo de photo a photoUrl
-    
-        return medic;
     }
 }

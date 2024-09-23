@@ -1,22 +1,22 @@
 package com.mitocode.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+import java.util.Objects;
 
-
+/*@Getter
+@Setter
+@ToString
+@EqualsAndHashCode*/
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-
-// Personalizar nombre de tabla y schema @Table(name ="tbl_patient", schema  ="sistemas")
+//@Table(name = "tbl_patient", schema = "sistemas")
 public class Patient {
 
     @Id
@@ -24,21 +24,23 @@ public class Patient {
     @EqualsAndHashCode.Include
     private Integer idPatient;
 
-    @Column(nullable = false, length = 70)
-    private String firstName;
+    @Column(nullable = false, length = 70) //name = "nombre",
+    private String firstName; //lowerCamelCase //BD snake first_name
 
     @Column(nullable = false, length = 70)
     private String lastName;
 
     @Column(nullable = false, length = 8)
     private String dni;
-    
+
     @Column(length = 150)
     private String address;
 
     @Column(nullable = false, length = 9)
     private String phone;
+
     @Column(nullable = false, length = 55)
     private String email;
+
 
 }

@@ -1,13 +1,13 @@
-package com.mitocode.mediaapp_backend;
+package com.mitocode;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class MediaappBackendApplicationTests {
+class MediappBackendApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }

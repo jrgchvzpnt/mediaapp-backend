@@ -1,43 +1,29 @@
 package com.mitocode.model;
 
-
-
-import org.hibernate.annotations.ManyToAny;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.*;
-
-
-
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Entity
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-
-
-
 public class ConsultDetail {
 
     @Id
-    @EqualsAndHashCode.Include
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idDetail;
 
-    @ManyToOne
+    @ManyToOne //FK
     @JoinColumn(name = "id_consult", nullable = false, foreignKey = @ForeignKey(name = "FK_DETAIL_CONSULT"))
     private Consult consult;
 
     @Column(nullable = false, length = 70)
-    private String diagnostic;
+    private String diagnosis;
 
     @Column(nullable = false, length = 300)
     private String treatment;
-
-
 }

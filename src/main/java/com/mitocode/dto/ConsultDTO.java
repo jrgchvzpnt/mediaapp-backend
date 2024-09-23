@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class ConsultDTO {
+
     @EqualsAndHashCode.Include
     private Integer idConsult;
 
@@ -31,9 +33,8 @@ public class ConsultDTO {
 
     @NotNull
     private LocalDateTime consultDate;
-    
+
     @JsonManagedReference
     @NotNull
     private List<ConsultDetailDTO> details;
-
 }

@@ -15,4 +15,3 @@ public class CustomErrorResponse {
     private String message;
     private String details;
 }
-

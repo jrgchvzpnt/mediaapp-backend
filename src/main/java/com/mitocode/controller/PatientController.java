@@ -1,24 +1,24 @@
 package com.mitocode.controller;
 
 import com.mitocode.dto.PatientDTO;
-
+import com.mitocode.dto.PatientRecord;
 import com.mitocode.model.Patient;
 import com.mitocode.service.IPatientService;
 import jakarta.validation.Valid;
-
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
-
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-
+import java.util.Objects;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -31,7 +31,6 @@ public class PatientController {
 
     //@Autowired
     private final IPatientService service;// = new PatientService();
-
     @Qualifier("defaultMapper")
     private final ModelMapper modelMapper;
 
@@ -101,5 +100,12 @@ public class PatientController {
     }
 
 
+    /*@GetMapping
+    public Patient save(){
+        Patient patient = new Patient();
+        patient.setIdPatient(0);
+        patient.setFirstName("mito");
+        return service.validAndSave(patient);
+    }*/
 
 }

@@ -1,10 +1,6 @@
 package com.mitocode.dto;
 
-
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,7 +32,10 @@ public class PatientDTO {
     @Pattern(regexp = "[0-9]+")
     private String phone;
 
-    @NotNull
     @Email
     private String email;
+
+    /*@Max(value = 11)
+    @Min(value = 1)
+    private int age;*/
 }

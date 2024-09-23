@@ -16,7 +16,7 @@ import java.util.Locale;
 @RequestMapping("/languages")
 @RequiredArgsConstructor
 public class LanguageController {
-    
+
     private final LocaleResolver localeResolver;
     private final HttpServletRequest httpServletRequest;
     private final HttpServletResponse httpServletResponse;

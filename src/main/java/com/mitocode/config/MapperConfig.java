@@ -6,14 +6,11 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-
 
 @Configuration
 public class MapperConfig {
 
     @Bean("defaultMapper")
-    @Primary  // Si prefieres hacer este el predeterminado
     public ModelMapper defaultMapper(){
         return new ModelMapper();
     }
@@ -22,22 +19,17 @@ public class MapperConfig {
     public ModelMapper medicMapper(){
         ModelMapper mapper = new ModelMapper();
 
-        // Mapeo de DTO a entidad (de MedicDTO a Medic)
+        //Escritura
         TypeMap<MedicDTO, Medic> typeMap1 = mapper.createTypeMap(MedicDTO.class, Medic.class);
-        typeMap1.addMapping(MedicDTO::getPrimaryName, Medic::setFirstName);
-        typeMap1.addMapping(MedicDTO::getSurname, Medic::setLastName);
-        typeMap1.addMapping(MedicDTO::getCmpMedic, Medic::setCmp);
-        typeMap1.addMapping(MedicDTO::getPhoto, Medic::setPhotoUrl);
-    
-    
-    
-        // Mapeo de entidad a DTO (de Medic a MedicDTO)
+        typeMap1.addMapping(MedicDTO::getPrimaryName, (dest, v)-> dest.setFirstName((String) v));
+        typeMap1.addMapping(MedicDTO::getSurname, (dest, v)-> dest.setLastName((String) v));
+        typeMap1.addMapping(MedicDTO::getPhoto, (dest, v)-> dest.setPhotoUrl((String) v));
+
+        //Lectura
         TypeMap<Medic, MedicDTO> typeMap2 = mapper.createTypeMap(Medic.class, MedicDTO.class);
-        typeMap2.addMapping(Medic::getFirstName, MedicDTO::setPrimaryName);
-        typeMap2.addMapping(Medic::getLastName, MedicDTO::setSurname);
-        typeMap2.addMapping(Medic::getCmp, MedicDTO::setCmpMedic);
-        typeMap2.addMapping(Medic::getPhotoUrl, MedicDTO::setPhoto);
-    
+        typeMap2.addMapping(Medic::getFirstName, (dest, v)-> dest.setPrimaryName((String) v));
+        typeMap2.addMapping(Medic::getLastName, (dest, v)-> dest.setSurname((String) v));
+
         return mapper;
     }
 }

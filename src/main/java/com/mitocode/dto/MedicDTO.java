@@ -1,6 +1,5 @@
 package com.mitocode.dto;
 
-
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -12,10 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-
 public class MedicDTO {
 
-     @EqualsAndHashCode.Include
+    @EqualsAndHashCode.Include
     private Integer idMedic;
 
     @NotNull
@@ -32,5 +30,4 @@ public class MedicDTO {
 
     @NotNull
     private String photo;
-
 }
