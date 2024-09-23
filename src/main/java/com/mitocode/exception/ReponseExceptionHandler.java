@@ -1,10 +1,11 @@
 package com.mitocode.exception;
 
-import java.net.URI;
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -12,11 +13,31 @@ import org.springframework.web.context.request.WebRequest;
 @RestControllerAdvice
 public class ReponseExceptionHandler {
 
-     @ExceptionHandler(ModelNotFoundException.class)
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<CustomErrorResponse> Exception(Exception ex, WebRequest request){
+        CustomErrorResponse err = new CustomErrorResponse(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+
+        return new ResponseEntity<>(err, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ModelNotFoundException.class)
     public ResponseEntity<CustomErrorResponse> handleModelNotFoundException(ModelNotFoundException ex, WebRequest request){
         CustomErrorResponse err = new CustomErrorResponse(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
 
         return new ResponseEntity<>(err, HttpStatus.NOT_FOUND);
+    }
+
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<CustomErrorResponse> handlerArgumentNotValid(MethodArgumentNotValidException ex, WebRequest request){
+        String msg = ex.getBindingResult().getFieldErrors().stream()
+                .map(e -> e.getField().concat(":").concat(e.getDefaultMessage()))
+                .collect(Collectors.joining(","));
+
+
+        CustomErrorResponse err = new CustomErrorResponse(LocalDateTime.now(), msg, request.getDescription(false));
+
+        return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
     }
 
      /*@ExceptionHandler(ModelNotFoundException.class)
