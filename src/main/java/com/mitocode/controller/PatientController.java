@@ -1,36 +1,43 @@
 package com.mitocode.controller;
 
-import java.net.URI;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import com.mitocode.dto.PatientDTO;
+
 import com.mitocode.model.Patient;
 import com.mitocode.service.IPatientService;
+import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 import java.util.List;
 
-import org.modelmapper.ModelMapper;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PutMapping;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("${patient.controller.path}")
+@RequestMapping("/patients")
+//@RequestMapping("${patient.controller.path}")
 @RequiredArgsConstructor
-
-
 public class PatientController {
 
-    
-     private final IPatientService service;
-     private final ModelMapper modelMapper;
+    //@Autowired
+    private final IPatientService service;// = new PatientService();
+
+    @Qualifier("defaultMapper")
+    private final ModelMapper modelMapper;
+
+    /*public PatientController(PatientService service) {
+        this.service = service;
+    }*/
 
     @GetMapping
     public ResponseEntity<List<PatientDTO>> findAll(){
@@ -42,11 +49,13 @@ public class PatientController {
     @GetMapping("/{id}")
     public ResponseEntity<PatientDTO> findById(@PathVariable("id") Integer id){
         Patient obj = service.findById(id);
+
         return ResponseEntity.ok(convertToDto(obj));
+        //return new ResponseEntity<>(obj, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<Void> save(@RequestBody PatientDTO dto){
+    public ResponseEntity<Void> save(@Valid @RequestBody PatientDTO dto){
         Patient obj = service.save(convertToEntity(dto));
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getIdPatient()).toUri();
@@ -55,13 +64,12 @@ public class PatientController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PatientDTO> update(@PathVariable("id") Integer id, @RequestBody PatientDTO dto){
+    public ResponseEntity<PatientDTO> update(@Valid @PathVariable("id") Integer id, @RequestBody PatientDTO dto){
         dto.setIdPatient(id);
         Patient obj = service.update(id, convertToEntity(dto));
 
         return ResponseEntity.ok(convertToDto(obj));
     }
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") Integer id){
@@ -69,7 +77,20 @@ public class PatientController {
 
         return ResponseEntity.noContent().build(); //204 NO CONTENT
     }
-    
+
+    @GetMapping("/hateoas/{id}")
+    public EntityModel<PatientDTO> findByIdHateoas(@PathVariable("id") Integer id){
+        EntityModel<PatientDTO> resource = EntityModel.of(convertToDto(service.findById(id)));
+
+        //generar un link informativo
+        WebMvcLinkBuilder link1 = linkTo(methodOn(this.getClass()).findById(id));
+        WebMvcLinkBuilder link2 = linkTo(methodOn(this.getClass()).findAll());
+
+        resource.add(link1.withRel("patient-info-byId"));
+        resource.add(link2.withRel("patient-all-info"));
+
+        return resource;
+    }
 
     private PatientDTO convertToDto(Patient obj){
         return modelMapper.map(obj, PatientDTO.class);
@@ -78,6 +99,7 @@ public class PatientController {
     private Patient convertToEntity(PatientDTO dto){
         return modelMapper.map(dto, Patient.class);
     }
-    
-     
+
+
+
 }
