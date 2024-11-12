@@ -2,11 +2,14 @@ package com.mitocode.controller;
 
 import com.mitocode.dto.ConsultDTO;
 import com.mitocode.dto.ConsultListExamDTO;
+import com.mitocode.dto.FilterConsultDTO;
 import com.mitocode.model.Consult;
 import com.mitocode.model.Exam;
 import com.mitocode.service.IConsultService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.apache.catalina.connector.Response;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -24,57 +29,65 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/consults")
-//@RequestMapping("${consult.controller.path}")
+// @RequestMapping("${consult.controller.path}")
 @RequiredArgsConstructor
 public class ConsultController {
 
-    //@Autowired
+    // @Autowired
     private final IConsultService service;// = new ConsultService();
-    @Qualifier("defaultMapper")
+    @Qualifier("consultMaper")
     private final ModelMapper modelMapper;
 
-    /*public ConsultController(ConsultService service) {
-        this.service = service;
-    }*/
+    /*
+     * public ConsultController(ConsultService service) {
+     * this.service = service;
+     * }
+     */
 
     @GetMapping
-    public ResponseEntity<List<ConsultDTO>> findAll(){
+    public ResponseEntity<List<ConsultDTO>> findAll() {
         List<ConsultDTO> list = service.findAll().stream().map(this::convertToDto).toList();
 
         return ResponseEntity.ok(list);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ConsultDTO> findById(@PathVariable("id") Integer id){
+    public ResponseEntity<ConsultDTO> findById(@PathVariable("id") Integer id) {
         Consult obj = service.findById(id);
 
         return ResponseEntity.ok(convertToDto(obj));
-        //return new ResponseEntity<>(obj, HttpStatus.OK);
+        // return new ResponseEntity<>(obj, HttpStatus.OK);
     }
 
-    /*@PostMapping
-    public ResponseEntity<Void> save(@Valid @RequestBody ConsultDTO dto){
-        Consult obj = service.save(convertToEntity(dto));
-
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getIdConsult()).toUri();
-
-        return ResponseEntity.created(location).build();
-    }*/
+    /*
+     * @PostMapping
+     * public ResponseEntity<Void> save(@Valid @RequestBody ConsultDTO dto){
+     * Consult obj = service.save(convertToEntity(dto));
+     * 
+     * URI location =
+     * ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand
+     * (obj.getIdConsult()).toUri();
+     * 
+     * return ResponseEntity.created(location).build();
+     * }
+     */
     @PostMapping
-    public ResponseEntity<Void> save(@Valid @RequestBody ConsultListExamDTO dto) throws Exception{
+    public ResponseEntity<Void> save(@Valid @RequestBody ConsultListExamDTO dto) throws Exception {
         Consult cons = convertToEntity(dto.getConsult());
-        //List<Exam> exams = dto.getLstExam().stream().map(e -> modelMapper.map(e, Exam.class)).toList();
-        List<Exam> exams = modelMapper.map(dto.getLstExam(), new TypeToken<List<Exam>>(){}.getType());
+        // List<Exam> exams = dto.getLstExam().stream().map(e -> modelMapper.map(e,
+        // Exam.class)).toList();
+        List<Exam> exams = modelMapper.map(dto.getLstExam(), new TypeToken<List<Exam>>() {
+        }.getType());
         Consult obj = service.saveTransactional(cons, exams);
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getIdConsult()).toUri();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getIdConsult())
+                .toUri();
 
         return ResponseEntity.created(location).build();
     }
 
-
     @PutMapping("/{id}")
-    public ResponseEntity<ConsultDTO> update(@Valid @PathVariable("id") Integer id, @RequestBody ConsultDTO dto){
+    public ResponseEntity<ConsultDTO> update(@Valid @PathVariable("id") Integer id, @RequestBody ConsultDTO dto) {
         dto.setIdConsult(id);
         Consult obj = service.update(id, convertToEntity(dto));
 
@@ -82,17 +95,17 @@ public class ConsultController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Integer id){
+    public ResponseEntity<Void> delete(@PathVariable("id") Integer id) {
         service.delete(id);
 
-        return ResponseEntity.noContent().build(); //204 NO CONTENT
+        return ResponseEntity.noContent().build(); // 204 NO CONTENT
     }
 
     @GetMapping("/hateoas/{id}")
-    public EntityModel<ConsultDTO> findByIdHateoas(@PathVariable("id") Integer id){
+    public EntityModel<ConsultDTO> findByIdHateoas(@PathVariable("id") Integer id) {
         EntityModel<ConsultDTO> resource = EntityModel.of(convertToDto(service.findById(id)));
 
-        //generar un link informativo
+        // generar un link informativo
         WebMvcLinkBuilder link1 = linkTo(methodOn(this.getClass()).findById(id));
         WebMvcLinkBuilder link2 = linkTo(methodOn(this.getClass()).findAll());
 
@@ -102,11 +115,29 @@ public class ConsultController {
         return resource;
     }
 
-    private ConsultDTO convertToDto(Consult obj){
+    @GetMapping("/search/dates")
+    public ResponseEntity<List<ConsultDTO>> searchByDates(
+            @RequestParam(value = "date1", defaultValue = "2024-04-11") String date1,
+            @RequestParam(value = "date2", defaultValue = "2024-04-11") String date2) {
+        List<Consult> consults = service.searchByDates(LocalDateTime.parse(date1), LocalDateTime.parse(date2));
+        List<ConsultDTO> consultsDTOs = modelMapper.map(consults, new TypeToken<List<ConsultDTO>>() {
+        }.getType());
+        return ResponseEntity.ok(consultsDTOs);
+    }
+
+    @PostMapping("/search/others")
+    public ResponseEntity<List<ConsultDTO>> searchByOthers(@RequestBody FilterConsultDTO filterDTO) {
+        List<Consult> consults = service.search(filterDTO.getDni(), filterDTO.getFullname());
+        List<ConsultDTO> consultsDTOs = modelMapper.map(consults, new TypeToken<List<ConsultDTO>>() {
+        }.getType());
+        return ResponseEntity.ok(consultsDTOs);
+    }
+
+    private ConsultDTO convertToDto(Consult obj) {
         return modelMapper.map(obj, ConsultDTO.class);
     }
 
-    private Consult convertToEntity(ConsultDTO dto){
+    private Consult convertToEntity(ConsultDTO dto) {
         return modelMapper.map(dto, Consult.class);
     }
 }

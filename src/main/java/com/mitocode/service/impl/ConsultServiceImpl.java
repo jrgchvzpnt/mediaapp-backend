@@ -10,13 +10,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ConsultServiceImpl extends CRUDImpl<Consult, Integer> implements IConsultService {
 
-    //@Autowired
+    // @Autowired
     private final IConsultRepo consultRepo;// = new ConsultRepo();
     private final IConsultExamRepo ceRepo;
 
@@ -28,9 +29,21 @@ public class ConsultServiceImpl extends CRUDImpl<Consult, Integer> implements IC
     @Transactional
     @Override
     public Consult saveTransactional(Consult consult, List<Exam> exams) {
-        consultRepo.save(consult); //GUARDAR MAESTRO DETALLE
-        exams.forEach(ex -> ceRepo.saveExam(consult.getIdConsult(), ex.getIdExam())); //INSERTANDO EN TABLA CONSULT_EXAM
-
+        consultRepo.save(consult); // GUARDAR MAESTRO DETALLE
+        exams.forEach(ex -> ceRepo.saveExam(consult.getIdConsult(), ex.getIdExam())); // INSERTANDO EN TABLA
+                                                                                      // CONSULT_EXAM
         return consult;
     }
+
+    @Override
+    public List<Consult> search(String dni, String fullname) {
+        return consultRepo.search(dni, fullname);
+    }
+
+    @Override
+    public List<Consult> searchByDates(LocalDateTime date1, LocalDateTime date2) {
+        final int OFFSET_DAYS = 1;
+        return consultRepo.searchByDates(date1, date2.plusDays(OFFSET_DAYS));
+    }
+
 }
